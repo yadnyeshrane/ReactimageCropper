@@ -104,8 +104,7 @@ function ImageCropper() {
                                     ...aspect,
                                     x: x,
                                     y: y,
-                                    height,
-                                    width,
+                                  
                                 });
                                 setImagedata({
                                     ...imagedata,
@@ -147,6 +146,7 @@ function ImageCropper() {
                         reader.readAsDataURL(file);
                     }}
                 />
+                <div className="col-6">
                 <ReactCrop
                     crop={aspect}
                     onChange={(filecrop) => {
@@ -156,6 +156,8 @@ function ImageCropper() {
                 >
                     <img src={fileimage} />
                 </ReactCrop>
+                </div>
+               
             </div>
         </div>
     );
