@@ -6,6 +6,16 @@ function ImageCropper() {
     const [file, selectFile] = useState(null);
     const [image, setImage] = useState(null);
     const [crop, setCrop] = useState();
+    const [crop2, setCrop2] = useState();
+    const [fileimage, setFileImage] = useState(null);
+    const [aspect, setAspect] = useState({
+        unit: "px",
+        x: 20,
+        y: 40,
+        height: 10,
+        width: 20,
+    });
+
     const [imagedata, setImagedata] = useState({
         xcoordinate: "",
         ycoordinate: "",
@@ -15,19 +25,6 @@ function ImageCropper() {
 
     useEffect(() => {
         const baseimageurl = "./images/testplan (1).png";
-        function convertNormalImagetoBase64(url, callback) {
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                var reader = new FileReader();
-                reader.onloadend = function () {
-                    callback(reader.result);
-                };
-                reader.readAsDataURL(xhr.response);
-            };
-            xhr.open("GET", url);
-            xhr.responseType = "blob";
-            xhr.send();
-        }
 
         convertNormalImagetoBase64(baseimageurl, function (dataUrl) {
             console.log("RESULT:", dataUrl);
@@ -35,6 +32,21 @@ function ImageCropper() {
             selectFile(dataUrl);
         });
     }, []);
+    function convertNormalImagetoBase64(url, callback) {
+        console.log("file", url);
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                callback(reader.result);
+            };
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open("GET", url);
+        xhr.responseType = "blob";
+        xhr.send();
+    }
+
     function getCroppedImg(image, crop, fileName = "img") {
         const canvas = document.createElement("canvas");
         const scaleX = image.naturalWidth / image.width;
@@ -86,8 +98,15 @@ function ImageCropper() {
                                 setImage(croppedImageUrl);
                             }}
                             onChange={(newcrop) => {
+                                console.log("newcrop", newcrop);
                                 const { x, y, height, width } = newcrop;
-
+                                setAspect({
+                                    ...aspect,
+                                    x: x,
+                                    y: y,
+                                    height,
+                                    width,
+                                });
                                 setImagedata({
                                     ...imagedata,
                                     xcoordinate: x,
@@ -112,6 +131,31 @@ function ImageCropper() {
                         />
                     )}
                 </div>
+            </div>
+            <div className="row">
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                        console.log("File", e.target.files[0]);
+                        var file = e.target.files[0];
+                        var reader = new FileReader();
+                        reader.onloadend = function () {
+                            console.log("RESULT", reader.result);
+                            setFileImage(reader.result);
+                        };
+                        reader.readAsDataURL(file);
+                    }}
+                />
+                <ReactCrop
+                    crop={aspect}
+                    onChange={(filecrop) => {
+                        const { x, y, height, width } = filecrop;
+                        setAspect({ ...aspect, x: x, y: y, height, width });
+                    }}
+                >
+                    <img src={fileimage} />
+                </ReactCrop>
             </div>
         </div>
     );
